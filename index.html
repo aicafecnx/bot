@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>AI Translate - ข้อความใหม่อยู่บน</title>
+  <title>AI Translate (ข้อความใหม่อยู่บน)</title>
   <style>
     body {
       font-family: sans-serif;
@@ -26,7 +26,7 @@
       max-height: 90vh;
       overflow-y: auto;
       display: flex;
-      flex-direction: column;
+      flex-direction: column-reverse;
     }
     .entry {
       background: #fff;
@@ -94,25 +94,25 @@
         if (tempDiv) tempDiv.remove();
         const div = document.createElement('div');
         div.className = 'entry';
-        div.innerHTML = <div class="original">🗣️ ${transcript}</div><div class="translated">⏳ กำลังแปล...</div>;
+        div.innerHTML = `<div class="original">🗣️ ${transcript}</div><div class="translated">⏳ กำลังแปล...</div>`;
         logEl.prepend(div);
         tempDiv = null;
 
         const translated = await translateText(transcript);
-        div.querySelector('.translated').textContent = 📝 ${translated};
+        div.querySelector('.translated').textContent = `📝 ${translated}`;
 
         while (logEl.childElementCount > maxEntries) {
-          logEl.removeChild(logEl.lastChild); // ลบรายการเก่าสุด (ล่างสุด)
+          logEl.removeChild(logEl.lastChild);
         }
 
       } else {
         if (!tempDiv) {
           tempDiv = document.createElement('div');
           tempDiv.className = 'entry';
-          tempDiv.innerHTML = <div class="original">🎙️ ${transcript}</div><div class="translated">...</div>;
+          tempDiv.innerHTML = `<div class="original">🎙️ ${transcript}</div><div class="translated">...</div>`;
           logEl.prepend(tempDiv);
         } else {
-          tempDiv.querySelector('.original').textContent = 🎙️ ${transcript};
+          tempDiv.querySelector('.original').textContent = `🎙️ ${transcript}`;
         }
       }
     };
@@ -130,7 +130,7 @@
 
   async function translateText(text) {
     try {
-      const res = await fetch(https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=th&dt=t&q=${encodeURIComponent(text)});
+      const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=th&dt=t&q=${encodeURIComponent(text)}`);
       const data = await res.json();
       return data[0][0][0];
     } catch (err) {
@@ -144,4 +144,5 @@
 
 </body>
 </html>
+
 
