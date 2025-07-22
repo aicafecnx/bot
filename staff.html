@@ -19,17 +19,18 @@
       flex-direction: column;
     }
     #customer {
-      background-color: #ffe6f0; /* ชมพูอ่อน */
+      background-color: #ffe6f0;
     }
     #staff {
-      background-color: #fff8dc; /* เหลืองอ่อน */
+      background-color: #fff8dc;
     }
     .controls {
       background: rgba(255,255,255,0.8);
       padding: 8px;
       position: sticky;
       top: 0;
-      z-index: 1;
+      z-index: 10;
+      border-radius: 6px;
     }
     .entry {
       background: white;
@@ -51,7 +52,7 @@
       font-size: 0.9rem;
     }
     button.active {
-      background-color: #28a745 !important; /* สีเขียว */
+      background-color: #28a745 !important;
       color: white;
     }
   </style>
@@ -134,7 +135,7 @@
         <div class="original">🗣️ ${text}</div>
         <div class="translated">📝 ${translated}</div>
       `;
-      logDiv.prepend(entry); // ข้อความใหม่อยู่บน
+      logDiv.appendChild(entry); // ข้อความเก่าอยู่บน ข้อความใหม่อยู่ล่าง
 
       speakText(translated, ttsLang);
     };
@@ -169,6 +170,7 @@
 
 </body>
 </html>
+
 
 
 
