@@ -13,10 +13,9 @@
     }
     .section {
       flex: 1;
-      overflow-y: auto;
-      padding: 10px;
       display: flex;
-      flex-direction: column-reverse;
+      flex-direction: column;
+      overflow: hidden;
     }
     #customer {
       background-color: #ffe4e1; /* ชมพูอ่อน */
@@ -25,7 +24,15 @@
       background-color: #fff8dc; /* เหลืองอ่อน */
     }
     .controls {
-      padding: 5px;
+      padding: 8px;
+      background-color: rgba(255,255,255,0.6);
+    }
+    .log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column; /* ใหม่อยู่ล่าง */
     }
     .entry {
       background: white;
@@ -64,43 +71,43 @@
 <!-- ลูกค้า -->
 <div id="customer" class="section">
   <div class="controls">
-    <label>🌐 ภาษาลูกค้า:
-      <select id="customerLang">
-        <option value="en-US">🇬🇧 อังกฤษ</option>
-        <option value="ja-JP">🇯🇵 ญี่ปุ่น</option>
-        <option value="zh-CN">🇨🇳 จีน</option>
-        <option value="ko-KR">🇰🇷 เกาหลี</option>
-        <option value="vi-VN">🇻🇳 เวียดนาม</option>
-        <option value="es-ES">🇪🇸 สเปน</option>
-        <option value="pt-PT">🇵🇹 โปรตุเกส</option>
-        <option value="fr-FR">🇫🇷 ฝรั่งเศส</option>
-        <option value="de-DE">🇩🇪 เยอรมัน</option>
-        <option value="th-TH">🇹🇭 ไทย</option>
-      </select>
-      <button id="customerBtn" class="inactive" onclick="startRecognition('customer')">🎤 customer </button>
-    </label>
+    🌐 ภาษาลูกค้า:
+    <select id="customerLang">
+      <option value="en-US">🇬🇧 อังกฤษ</option>
+      <option value="ja-JP">🇯🇵 ญี่ปุ่น</option>
+      <option value="zh-CN">🇨🇳 จีน</option>
+      <option value="ko-KR">🇰🇷 เกาหลี</option>
+      <option value="vi-VN">🇻🇳 เวียดนาม</option>
+      <option value="es-ES">🇪🇸 สเปน</option>
+      <option value="pt-PT">🇵🇹 โปรตุเกส</option>
+      <option value="fr-FR">🇫🇷 ฝรั่งเศส</option>
+      <option value="de-DE">🇩🇪 เยอรมัน</option>
+      <option value="th-TH">🇹🇭 ไทย</option>
+    </select>
+    <button id="customerBtn" class="inactive" onclick="startRecognition('customer')">🎤 ลูกค้าพูด</button>
   </div>
+  <div class="log" id="customerLog"></div>
 </div>
 
 <!-- พนักงาน -->
 <div id="staff" class="section">
   <div class="controls">
-    <label>🌐 ภาษาเป้าหมายของลูกค้า:
-      <select id="staffLang">
-        <option value="en">🇬🇧 อังกฤษ</option>
-        <option value="ja">🇯🇵 ญี่ปุ่น</option>
-        <option value="zh-CN">🇨🇳 จีน</option>
-        <option value="ko">🇰🇷 เกาหลี</option>
-        <option value="vi">🇻🇳 เวียดนาม</option>
-        <option value="es">🇪🇸 สเปน</option>
-        <option value="pt">🇵🇹 โปรตุเกส</option>
-        <option value="fr">🇫🇷 ฝรั่งเศส</option>
-        <option value="de">🇩🇪 เยอรมัน</option>
-        <option value="th">🇹🇭 ไทย</option>
-      </select>
-      <button id="staffBtn" class="inactive" onclick="startRecognition('staff')">🎤 พนักงานพูด</button>
-    </label>
+    🌐 ภาษาเป้าหมายของลูกค้า:
+    <select id="staffLang">
+      <option value="en">🇬🇧 อังกฤษ</option>
+      <option value="ja">🇯🇵 ญี่ปุ่น</option>
+      <option value="zh-CN">🇨🇳 จีน</option>
+      <option value="ko">🇰🇷 เกาหลี</option>
+      <option value="vi">🇻🇳 เวียดนาม</option>
+      <option value="es">🇪🇸 สเปน</option>
+      <option value="pt">🇵🇹 โปรตุเกส</option>
+      <option value="fr">🇫🇷 ฝรั่งเศส</option>
+      <option value="de">🇩🇪 เยอรมัน</option>
+      <option value="th">🇹🇭 ไทย</option>
+    </select>
+    <button id="staffBtn" class="inactive" onclick="startRecognition('staff')">🎤 พนักงานพูด</button>
   </div>
+  <div class="log" id="staffLog"></div>
 </div>
 
 <script>
@@ -108,7 +115,6 @@
   let activeBtn = null;
 
   function startRecognition(mode) {
-    // ปิด recognition เดิมถ้ามี
     if (recognition) {
       recognition.stop();
       if (activeBtn) {
@@ -120,13 +126,17 @@
     const lang = (mode === 'customer')
       ? document.getElementById('customerLang').value
       : 'th-TH';
-    const targetLang = (mode === 'customer') ? 'th' : document.getElementById('staffLang').value;
-    const btn = document.getElementById(mode + 'Btn');
 
-    // ตั้งค่าปุ่มสีเขียว
-    activeBtn = btn;
+    const targetLang = (mode === 'customer')
+      ? 'th'
+      : document.getElementById('staffLang').value;
+
+    const btn = document.getElementById(mode + 'Btn');
+    const logDiv = document.getElementById(mode + 'Log');
+
     btn.classList.remove('inactive');
     btn.classList.add('active');
+    activeBtn = btn;
 
     recognition = new webkitSpeechRecognition();
     recognition.lang = lang;
@@ -136,14 +146,15 @@
     recognition.onresult = async (event) => {
       const text = event.results[0][0].transcript;
       const translated = await translateText(text, targetLang);
-      const container = document.getElementById(mode);
+
       const entry = document.createElement('div');
       entry.className = 'entry';
       entry.innerHTML = `
         <div class="original">🗣️ ${text}</div>
         <div class="translated">📝 ${translated}</div>
       `;
-      container.insertBefore(entry, container.querySelector('.controls'));
+      logDiv.appendChild(entry); // ใส่ด้านล่าง
+      logDiv.scrollTop = logDiv.scrollHeight; // เลื่อนลงล่างสุด
     };
 
     recognition.onerror = (e) => {
@@ -151,7 +162,6 @@
     };
 
     recognition.onend = () => {
-      // กลับเป็นปุ่มสีเทา
       btn.classList.remove('active');
       btn.classList.add('inactive');
     };
@@ -172,4 +182,5 @@
 
 </body>
 </html>
+
 
