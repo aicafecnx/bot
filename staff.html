@@ -14,7 +14,6 @@
     .section {
       flex: 1;
       overflow-y: auto;
-      padding: 10px;
       display: flex;
       flex-direction: column;
     }
@@ -25,16 +24,16 @@
       background-color: #fff8dc;
     }
     .controls {
-      background: rgba(255,255,255,0.8);
-      padding: 8px;
+      background: rgba(255,255,255,0.9);
+      padding: 10px;
       position: sticky;
       top: 0;
       z-index: 10;
-      border-radius: 6px;
+      border-bottom: 1px solid #ccc;
     }
     .entry {
       background: white;
-      margin: 6px 0;
+      margin: 6px 10px;
       padding: 10px 14px;
       border-radius: 10px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
@@ -75,7 +74,7 @@
         <option value="de-DE">🇩🇪 เยอรมัน</option>
         <option value="th-TH">🇹🇭 ไทย</option>
       </select>
-      <button id="btnCustomer" onclick="startRecognition('customer')">🎤 customer</button>
+      <button id="btnCustomer" onclick="startRecognition('customer')">🎤 Customer</button>
     </label>
   </div>
 </div>
@@ -135,7 +134,8 @@
         <div class="original">🗣️ ${text}</div>
         <div class="translated">📝 ${translated}</div>
       `;
-      logDiv.appendChild(entry); // ข้อความเก่าอยู่บน ข้อความใหม่อยู่ล่าง
+      // ข้อความใหม่อยู่บนสุด
+      logDiv.insertBefore(entry, logDiv.querySelector('.controls').nextSibling);
 
       speakText(translated, ttsLang);
     };
@@ -170,6 +170,7 @@
 
 </body>
 </html>
+
 
 
 
