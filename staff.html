@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>AI 2-Way Voice Translator</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .section {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column-reverse;
+    }
+    #customer {
+      background-color: #f0f8ff;
+    }
+    #staff {
+      background-color: #fff8dc;
+    }
+    .controls {
+      padding: 5px;
+    }
+    .entry {
+      background: white;
+      margin: 6px 0;
+      padding: 10px 14px;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .original {
+      font-weight: bold;
+    }
+    .translated {
+      margin-top: 4px;
+      color: #555;
+    }
+    select, button {
+      margin: 2px;
+      padding: 5px 10px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ลูกค้า -->
+<div id="customer" class="section">
+  <div class="controls">
+    <label>🌐 ภาษาลูกค้า:
+      <select id="customerLang">
+        <option value="en-US">🇬🇧 อังกฤษ</option>
+        <option value="ja-JP">🇯🇵 ญี่ปุ่น</option>
+        <option value="zh-CN">🇨🇳 จีน</option>
+        <option value="ko-KR">🇰🇷 เกาหลี</option>
+        <option value="vi-VN">🇻🇳 เวียดนาม</option>
+        <option value="es-ES">🇪🇸 สเปน</option>
+        <option value="pt-PT">🇵🇹 โปรตุเกส</option>
+        <option value="fr-FR">🇫🇷 ฝรั่งเศส</option>
+        <option value="de-DE">🇩🇪 เยอรมัน</option>
+        <option value="th-TH">🇹🇭 ไทย</option>
+      </select>
+      <button onclick="startRecognition('customer')">🎤 ลูกค้าพูด</button>
+    </label>
+  </div>
+</div>
+
+<!-- พนักงาน -->
+<div id="staff" class="section">
+  <div class="controls">
+    <label>🌐 ภาษาเป้าหมายของลูกค้า:
+      <select id="staffLang">
+        <option value="en">🇬🇧 อังกฤษ</option>
+        <option value="ja">🇯🇵 ญี่ปุ่น</option>
+        <option value="zh-CN">🇨🇳 จีน</option>
+        <option value="ko">🇰🇷 เกาหลี</option>
+        <option value="vi">🇻🇳 เวียดนาม</option>
+        <option value="es">🇪🇸 สเปน</option>
+        <option value="pt">🇵🇹 โปรตุเกส</option>
+        <option value="fr">🇫🇷 ฝรั่งเศส</option>
+        <option value="de">🇩🇪 เยอรมัน</option>
+        <option value="th">🇹🇭 ไทย</option>
+      </select>
+      <button onclick="startRecognition('staff')">🎤 พนักงานพูด</button>
+    </label>
+  </div>
+</div>
+
+<script>
+  let recognition;
+
+  function startRecognition(mode) {
+    if (recognition) recognition.stop();
+
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = (mode === 'customer')
+      ? document.getElementById('customerLang').value
+      : 'th-TH';
+
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    recognition.onresult = async (event) => {
+      const text = event.results[0][0].transcript;
+      const translated = await translateText(text, mode);
+      const container = document.getElementById(mode);
+      const entry = document.createElement('div');
+      entry.className = 'entry';
+      entry.innerHTML = `
+        <div class="original">🗣️ ${text}</div>
+        <div class="translated">📝 ${translated}</div>
+      `;
+      container.insertBefore(entry, container.querySelector('.controls'));
+    };
+
+    recognition.onerror = (e) => {
+      alert("⚠️ Error: " + e.error);
+    };
+
+    recognition.start();
+  }
+
+  async function translateText(text, mode) {
+    const targetLang = (mode === 'customer')
+      ? 'th' // ลูกค้าพูด → แปลเป็นไทย
+      : document.getElementById('staffLang').value; // พนักงานพูด → แปลเป็นภาษาลูกค้า
+
+    try {
+      const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
+      const data = await res.json();
+      return data[0][0][0];
+    } catch (e) {
+      return '[แปลไม่ได้]';
+    }
+  }
+</script>
+
+</body>
+</html>
