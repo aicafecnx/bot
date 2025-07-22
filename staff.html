@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>AI 2-Way Voice Translator</title>
+  <title>AI 2-Way Voice Translator with TTS</title>
   <style>
     body {
       margin: 0;
@@ -32,7 +32,7 @@
       overflow-y: auto;
       padding: 10px;
       display: flex;
-      flex-direction: column; /* ใหม่อยู่ล่าง */
+      flex-direction: column;
     }
     .entry {
       background: white;
@@ -131,6 +131,10 @@
       ? 'th'
       : document.getElementById('staffLang').value;
 
+    const ttsLang = (mode === 'customer')
+      ? 'th-TH'
+      : document.getElementById('staffLang').value; // ใช้รหัสภาษาสำหรับ TTS
+
     const btn = document.getElementById(mode + 'Btn');
     const logDiv = document.getElementById(mode + 'Log');
 
@@ -153,8 +157,10 @@
         <div class="original">🗣️ ${text}</div>
         <div class="translated">📝 ${translated}</div>
       `;
-      logDiv.appendChild(entry); // ใส่ด้านล่าง
-      logDiv.scrollTop = logDiv.scrollHeight; // เลื่อนลงล่างสุด
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+
+      speakText(translated, ttsLang); // พูดแปลกลับ
     };
 
     recognition.onerror = (e) => {
@@ -178,9 +184,16 @@
       return '[แปลไม่ได้]';
     }
   }
+
+  function speakText(text, langCode) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = langCode;
+    window.speechSynthesis.speak(utterance);
+  }
 </script>
 
 </body>
 </html>
+
 
 
